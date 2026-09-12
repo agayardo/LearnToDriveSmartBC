@@ -8,6 +8,7 @@ from tools.pagekit import Page, TranslationJob
 
 ROOT = Path(__file__).resolve().parent.parent
 PAGE_19 = ROOT / "pages" / "019.pdf"
+PAGE_14 = ROOT / "pages" / "014.pdf"
 
 
 @pytest.fixture(scope="module")
@@ -41,6 +42,15 @@ def test_page_19_four_body_paragraphs_each_become_one_region_with_inline_bold(pa
     assert len(bodies) == 4
     assert bodies[0].english.startswith("You’re reading this guide")
     assert bodies[3].html.endswith("(see <b>chapter 9 — your licence</b>).</p>")
+
+
+def test_a_list_item_opening_with_a_bold_run_is_a_regular_weight_region_with_that_run_bold():
+    item = region_by_text(Page(PAGE_14), "presents some of the")
+    assert item.style.weight == 400
+    assert item.html == (
+        '<p class="li">■&nbsp;<b>Chapter 1, you in the driver’s seat</b>, '
+        "presents some of the common choices that every driver makes.</p>"
+    )
 
 
 def test_page_19_story_panel_text_is_italic_and_the_question_is_bold_italic(page19):
@@ -147,3 +157,37 @@ def test_body_and_sidebar_text_is_set_at_95_percent_and_headings_at_full_size(pa
     assert "font-size: 9.0pt" in body.css()
     heading = region_by_text(page19, "Keep learning")
     assert "font-size: 14.0pt" in heading.css()
+
+
+def test_apply_reads_a_json_translation_file_and_writes_the_ua_pdf(tmp_path):
+    import json
+    from tools.pagekit import main
+
+    spec = {
+        "page": "pages/019.pdf",
+        "regions": [
+            {"ids": ["r02"], "html": "<p>Продовжуйте вчитися</p>"},
+            {"ids": ["r11", "r12", "r13", "r14"], "html": "<p>Текст</p>", "rect": [180, 407, 450, 660]},
+            {"ids": ["r09"], "html": "<p>або</p>", "center": True},
+        ],
+    }
+    spec_path = tmp_path / "019.json"
+    spec_path.write_text(json.dumps(spec, ensure_ascii=False), encoding="utf-8")
+    out = tmp_path / "019.ua.pdf"
+
+    main(["apply", str(spec_path), "--out", str(out)])
+
+    text = pymupdf.open(out)[0].get_text()
+    assert "Продовжуйте вчитися" in text and "Keep learning" not in text
+    assert "You’re reading this guide" not in text
+    assert "As you’re driving" in text  # untranslated regions stay English
+
+
+def test_the_committed_page_19_translation_applies_cleanly(tmp_path):
+    from tools.pagekit import main
+
+    out = tmp_path / "019.ua.pdf"
+    main(["apply", str(ROOT / "translations" / "019.json"), "--out", str(out)])
+    page = pymupdf.open(out)[0]
+    assert re.findall(r"[A-Za-z]{2,}", page.get_text()) == []
+    assert "Продовжуйте вчитися" in page.get_text()

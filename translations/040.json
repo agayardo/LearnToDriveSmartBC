@@ -1,0 +1,23 @@
+{
+  "page": "pages/040.pdf",
+  "regions": [
+    {"ids": ["r02"], "html": "<p>знаки, сигнали та дорожня розмітка</p>", "rect": [178, 59, 455, 81]},
+    {"ids": ["r03"], "html": "<p>У <b>розділі 2, ви і ваш транспортний засіб</b>, ви дізналися про деякі органи керування у вашому транспортному засобі. Цей розділ — зручний довідковий матеріал із прикладами найпоширеніших знаків, сигналів і дорожньої розмітки, які тримають рух організованим і плавним.</p>", "rect": [180, 128, 456, 196]},
+    {"ids": ["r04"], "html": "<p>у цьому розділі</p>", "center": true},
+    {"ids": ["r05", "r11"], "html": "<p style=\"margin:0 0 1pt 0;margin-left:6pt;text-indent:-6pt\">■&nbsp;Знаки</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;регулювальні знаки</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки школи, ігрового майданчика та пішохідного переходу</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки використання смуг</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки керування поворотами</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки паркування</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки зарезервованих смуг</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;попереджувальні знаки</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;маркери перешкод</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки дорожніх робіт</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;інформаційні та вказівні знаки</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;знаки залізничного переїзду</p><p style=\"margin:3pt 0 1pt 0;margin-left:6pt;text-indent:-6pt\">■&nbsp;Сигнали</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;сигнали керування смугами</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;світлофори</p><p style=\"margin:3pt 0 1pt 0;margin-left:6pt;text-indent:-6pt\">■&nbsp;Дорожня розмітка</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;жовті лінії</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;білі лінії</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;розмітка зарезервованих смуг</p><p style=\"margin:0 0 0 0;margin-left:13pt;text-indent:-7pt\">–&nbsp;інша розмітка</p>", "rect": [66, 163, 162, 512]},
+    {"ids": ["r06"], "html": "<p>Знаки</p>"},
+    {"ids": ["r07"], "html": "<p>Знаки читають трьома способами: за формою, кольором і повідомленням, надрукованим на них. Розуміння цих трьох способів класифікації знаків допоможе вам визначити значення знаків, які для вас нові.</p>", "rect": [180, 229, 456, 286]},
+    {"ids": ["r08"], "html": "<p>Зупинка</p>", "rect": [205, 349, 320, 378]},
+    {"ids": ["r09"], "html": "<p>Уступіть право переваги</p>", "rect": [335, 349, 465, 378]},
+    {"ids": ["r13"], "html": "<p>Показує норми водіння</p>", "rect": [190, 451, 282, 480]},
+    {"ids": ["r12"], "html": "<p>Пояснює використання смуг</p>", "rect": [288, 442, 378, 480]},
+    {"ids": ["r10"], "html": "<p>Знаки шкільної зони&nbsp;— флуоресцентні жовто-зелені</p>", "rect": [383, 435, 468, 480]},
+    {"ids": ["r14"], "html": "<p>Повідомляє про послуги для водіїв</p>", "rect": [184, 546, 280, 580]},
+    {"ids": ["r15"], "html": "<p>Показує дозволену дію</p>", "rect": [284, 546, 380, 580]},
+    {"ids": ["r16"], "html": "<p>Показує дію, яка не дозволена</p>", "rect": [383, 546, 470, 580]},
+    {"ids": ["r18"], "html": "<p>Попереджає про небезпеки попереду</p>", "rect": [93, 648, 182, 690]},
+    {"ids": ["r19"], "html": "<p>Попереджає про зони дорожніх робіт</p>", "rect": [185, 648, 280, 690]},
+    {"ids": ["r20"], "html": "<p>Залізничний переїзд</p>", "rect": [283, 648, 378, 690]},
+    {"ids": ["r17"], "html": "<p>Показує відстань і напрямок</p>", "rect": [383, 629, 470, 670]}
+  ]
+}

@@ -1,19 +1,28 @@
 """Deterministic mechanics for translating one page of the handbook in place.
 
-    .venv/bin/python -m tools.pagekit inspect pages/019.pdf     # regions, ids, places of interest
-    .venv/bin/python -m tools.pagekit render  pages/019.pdf     # pages/019.png
+    .venv/bin/python -m tools.pagekit inspect pages/NNN.pdf         # regions, ids, places of interest
+    .venv/bin/python -m tools.pagekit render  pages/NNN.pdf         # pages/NNN.png
+    .venv/bin/python -m tools.pagekit apply   translations/NNN.json  # pages/NNN.ua.pdf, pages/NNN.ua.png
 
-A per-page script supplies the Ukrainian text per region id and calls TranslationJob.save().
-The job redacts the English text over its full original extent (drawings and images stay),
-lays the translation into the region's rectangle with the Avenir Next faces from fonts/,
-shrinks the font until it fits, and reports every box that shrank or was left untranslated.
+translations/NNN.json holds the Ukrainian text per region id:
+
+    {"page": "pages/NNN.pdf",
+     "regions": [{"ids": ["r02"], "html": "<p>Заголовок</p>"},
+                 {"ids": ["r11", "r12"], "html": "<p>...</p><p>...</p>", "rect": [x0, y0, x1, y1]},
+                 {"ids": ["r09"], "html": "<p>або</p>", "center": true}]}
+
+"ids" with several entries share one box (their union unless "rect" is given). apply redacts
+the English text over its full original extent (drawings and images stay), lays the translation
+into the box with the Avenir Next faces from fonts/, shrinks the font until it fits, and prints
+the scale per box, the regions left untranslated, and English words still on the page.
 """
 from __future__ import annotations
 
 import html as html_lib
+import json
 import re
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import pymupdf
@@ -43,6 +52,15 @@ class Style:
             italic="Oblique" in font or "Italic" in font,
         )
 
+    @staticmethod
+    def of_lines(lines: list["Line"]) -> "Style":
+        """The lead span's style at the lightest weight in the region, so that a paragraph opening with a bold
+        run — a list item naming a chapter, a contents entry before its leader dots — keeps that run as the
+        only bold one instead of setting the whole paragraph bold."""
+        lead = lines[0].lead.style
+        weights = [s.style.weight for line in lines for s in line.spans if not s.is_bullet]
+        return replace(lead, weight=min(weights, default=lead.weight))
+
 
 def _weight(font: str) -> int:
     if any(w in font for w in ("Black", "Bold")) and "Semi" not in font and "Demi" not in font:
@@ -63,7 +81,9 @@ class Span:
 
     @property
     def is_bullet(self) -> bool:
-        return "ZapfDingbats" in self.font or self.text.strip() in BULLET_GLYPHS
+        text = self.text.strip()
+        # Some lists set the bullet as a repeated glyph, e.g. "••" in a text font.
+        return "ZapfDingbats" in self.font or (text != "" and set(text) <= set(BULLET_GLYPHS))
 
 
 @dataclass
@@ -312,7 +332,7 @@ class Page:
                 rect = extent + (0, 0, ROOM_RIGHT, ROOM_BELOW)
             if role in ("heading", "panel-title") and extent.x0 >= SIDEBAR_MAX_X:
                 rect.x1 = max(rect.x1, COLUMN_RIGHT)
-            regions.append(Region(f"r{n:02d}", role, glines, rect, glines[0].lead.style, center=role in CENTERED_ROLES, shape=shape))
+            regions.append(Region(f"r{n:02d}", role, glines, rect, Style.of_lines(glines), center=role in CENTERED_ROLES, shape=shape))
         return _separated(regions)
 
     def _inscribed(self, shape: Rect) -> Rect:
@@ -561,8 +581,23 @@ def _visible_drawings(page: pymupdf.Page) -> list[dict]:
 # --- command line -----------------------------------------------------------------
 
 
+def apply(spec_path: Path, out: Path | None = None) -> Report:
+    spec = json.loads(Path(spec_path).read_text(encoding="utf-8"))
+    page_path = ROOT / spec["page"] if not Path(spec["page"]).is_absolute() else Path(spec["page"])
+    job = TranslationJob(page_path)
+    for entry in spec["regions"]:
+        rect = Rect(*entry["rect"]) if "rect" in entry else None
+        job.set(entry["ids"], entry["html"], rect=rect, center=entry.get("center"))
+    out = Path(out) if out else page_path.with_suffix(".ua.pdf")
+    return job.save(out, preview=out.with_suffix(".png"))
+
+
 def main(argv: list[str] | None = None) -> None:
     argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ["apply"] and len(argv) in (2, 4):
+        out = Path(argv[3]) if len(argv) == 4 and argv[2] == "--out" else None
+        print(apply(Path(argv[1]), out))
+        return
     if len(argv) != 2 or argv[0] not in ("inspect", "render"):
         sys.exit(__doc__)
     page = Page(argv[1])
