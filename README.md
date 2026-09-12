@@ -17,42 +17,48 @@ The book is too large to translate in one pass, and a PDF is not an editable doc
 
 ## Per-page translation technique
 
-Proven on printed page 7 with a throwaway script. Documented in `docs/translate-page.md`.
+Remove the English text from the page with redactions that keep drawings and images, lay the Ukrainian text into the same boxes with Avenir Next, and shrink the font where it does not fit. Implemented in `tools/pagekit.py`. The agent procedure is `notes/translate-page.md`.
 
 ## Layout
 
 - `driver-full.pdf` — the source.
-- `pages/NNN.pdf` — one file per page, produced by `qpdf --split-pages driver-full.pdf pages/%d.pdf`. A page is translated in place and renamed to `pages/NNN.ua.pdf`, so a page is done when its `.ua.pdf` exists. Re-run the split command to restore an original. PNG renders in `pages/` are gitignored scratch files.
-- `docs/analysis.md` — how the PDF is built and what makes translation hard.
-- `docs/translate-page.md` — instructions for the agent that translates one page.
-- `docs/glossary.md` — shared terminology.
+- `pages/NNN.pdf` — one file per page, produced by `qpdf --split-pages driver-full.pdf pages/%d.pdf`. Never modified.
+- `pages/NNN.ua.pdf` — the translated page, written by `apply` from `translations/NNN.json`. A page is done when this file exists. PNG renders in `pages/` are gitignored scratch files.
+- `docs/LearnToDriveSmart_UA.pdf` — the translated pages merged in order with `qpdf`, then re-saved with PyMuPDF's full garbage collection so that the Avenir Next faces, which every page embeds, are stored once.
+- `docs/` — the GitHub Pages site: `index.html`, the PDF above, its cover, `robots.txt`, `sitemap.xml`. Written for readers of the translation, not for contributors.
+- `translations/NNN.json` — one file per page: region ids mapped to Ukrainian HTML, optional box and centering.
+- `translation-report.md` — TODO lines for a human reviewer, appended per page as described in `notes/translate-page.md`.
+- `notes/analysis.md` — how the PDF is built and what makes translation hard.
+- `notes/translate-page.md` — instructions for the agent that translates one page.
+- `translation-glossary-ua.md` — recurring terms whose translation is a choice, `<english text> -> <ua translation>`, read in full before each page and appended when a page settles one. Kept short on purpose.
 - `fonts/` — the Avenir Next faces split into `.ttf` files (macOS system fonts, not committed).
-- `.venv/` — Python with PyMuPDF and fontTools.
+- `tools/pagekit.py`, `tests/` — the tool and its tests.
+- `.venv/` — Python with PyMuPDF, fontTools, and pytest.
 
 ## Tools
 
 `tools/pagekit.py` holds the deterministic part of the technique above. It needs `.venv` (PyMuPDF, fontTools, pytest) and the faces in `fonts/`.
 
 ```bash
-.venv/bin/python -m tools.pagekit inspect pages/019.pdf   # regions with ids, boxes, styles; places of interest
-.venv/bin/python -m tools.pagekit render  pages/019.pdf   # pages/019.png
-.venv/bin/python -m translations.019                      # apply one page's translation
-.venv/bin/python -m pytest                                 # tests, run against pages/019.pdf
+.venv/bin/python -m tools.pagekit inspect pages/NNN.pdf          # regions with ids, boxes, styles; places of interest
+.venv/bin/python -m tools.pagekit render  pages/NNN.pdf          # pages/NNN.png
+.venv/bin/python -m tools.pagekit apply   translations/NNN.json  # pages/NNN.ua.pdf and a preview PNG
+.venv/bin/python -m pytest
 ```
 
 `inspect` groups the text layer into regions (paragraph, heading, sidebar note, caption, bubble, label) in reading order, gives each an id and the box the translation goes into, and lists places of interest: bubbles, pills, narrow captions, small text, illustrations with and without a text layer, tables. Bubble boxes are measured on a render as the widest white rectangle inside the cloud.
 
-A page script in `translations/NNN.py` maps region ids to Ukrainian HTML and calls `TranslationJob.save()`. The job redacts each region over its full original extent with drawings kept, lays the text into the box with the Avenir Next faces, shrinks until it fits, centres bubble and label text, and reports the scale per box, boxes left untranslated, English words still on the page, and the drawing count before and after. Several regions can share one box, as the four body paragraphs on page 19 do. `translations/019.py` is the worked example.
+`translations/NNN.json` maps region ids to Ukrainian HTML, with an optional box and centering flag per entry. `apply` redacts each region over its full original extent with drawings kept, lays the text into the box with the Avenir Next faces, shrinks until it fits, centres bubble and label text, and reports the scale per box, boxes left untranslated, English words still on the page, and the drawing count before and after. Several regions can share one box.
 
 ## Known challenges
 
-- Ukrainian text is longer than English, so pages need reflow or font-size adjustments.
-- Every embedded font is a subset with only the glyphs the English text used, and none has Cyrillic glyphs. Avenir Next (see `docs/translate-page.md`) is the substitute.
+- Ukrainian text is longer than English. Body, sidebar, and story text is set at 95% of the original size on every page; boxes that still do not fit shrink further and are flagged for review.
+- Every embedded font is a subset with only the glyphs the English text used, and none has Cyrillic glyphs. Avenir Next (see `notes/translate-page.md`) is the substitute.
 - Detecting which illustrations contain vectorized text versus pure graphics.
-- BC-specific legal and road-sign terminology needs a glossary so wording stays consistent across pages.
+- BC-specific legal and road-sign terminology must be translated the same way on every page; `translation-glossary-ua.md` is the shared record.
 
 ## Status
 
-`tools/pagekit.py` and `translations/019.py` implement the per-page technique; page 19 is translated (`pages/019.ua.pdf`). Lettering inside illustrations that is drawn as paths is not handled yet. The source is split into `pages/`; translation has not started.
+All 177 pages are translated and merged into `docs/LearnToDriveSmart_UA.pdf`. Lettering inside illustrations that is drawn as paths is not handled by the tool.
 
-See [docs/analysis.md](docs/analysis.md) for the PDF inspection results and the proposed pipeline.
+See [notes/analysis.md](notes/analysis.md) for the PDF inspection results and the proposed pipeline.

@@ -5,3 +5,5 @@ __pycache__/
 out/
 fonts/
 pages/*.png
+driver-full.pdf
+pages/*.pdf
