@@ -39,6 +39,24 @@
     "author": { "@type": "Organization", "name": "ICBC" },
     "url": "https://icbc.com/driver-licensing/driving-guides/Learn-to-Drive-Smart"
   },
+  "hasPart": [
+    { "@type": "Chapter", "name": "Що взяти до офісу видачі посвідчень водія", "url": "https://agayardo.github.io/LearnToDriveSmartBC/what-to-take-to-the-driver-licensing-office.html" },
+    { "@type": "Chapter", "name": "Використання цього посібника", "url": "https://agayardo.github.io/LearnToDriveSmartBC/using-this-guide.html" },
+    { "@type": "Chapter", "name": "Розділ 1: ви за кермом", "url": "https://agayardo.github.io/LearnToDriveSmartBC/01-you-in-the-driver-s-seat.html" },
+    { "@type": "Chapter", "name": "Розділ 2: ви і ваш транспортний засіб", "url": "https://agayardo.github.io/LearnToDriveSmartBC/02-you-and-your-vehicle.html" },
+    { "@type": "Chapter", "name": "Розділ 3: знаки, сигнали та дорожня розмітка", "url": "https://agayardo.github.io/LearnToDriveSmartBC/03-signs-signals-and-road-markings.html" },
+    { "@type": "Chapter", "name": "Розділ 4: правила дорожнього руху", "url": "https://agayardo.github.io/LearnToDriveSmartBC/04-rules-of-the-road.html" },
+    { "@type": "Chapter", "name": "Розділ 5: дивись – думай – дій", "url": "https://agayardo.github.io/LearnToDriveSmartBC/05-see-think-do.html" },
+    { "@type": "Chapter", "name": "Розділ 6: спільне користування дорогою", "url": "https://agayardo.github.io/LearnToDriveSmartBC/06-sharing-the-road.html" },
+    { "@type": "Chapter", "name": "Розділ 7: особисті стратегії", "url": "https://agayardo.github.io/LearnToDriveSmartBC/07-personal-strategies.html" },
+    { "@type": "Chapter", "name": "Розділ 8: стратегії в надзвичайних ситуаціях", "url": "https://agayardo.github.io/LearnToDriveSmartBC/08-emergency-strategies.html" },
+    { "@type": "Chapter", "name": "Розділ 9: ваше посвідчення водія", "url": "https://agayardo.github.io/LearnToDriveSmartBC/09-your-licence.html" },
+    { "@type": "Chapter", "name": "Розділ 10: додаткова інформація", "url": "https://agayardo.github.io/LearnToDriveSmartBC/10-more-information.html" },
+    { "@type": "Chapter", "name": "Про тест на знання", "url": "https://agayardo.github.io/LearnToDriveSmartBC/about-the-knowledge-test.html" },
+    { "@type": "Chapter", "name": "Про ваш дорожній тест", "url": "https://agayardo.github.io/LearnToDriveSmartBC/about-your-road-test.html" },
+    { "@type": "Chapter", "name": "Поради екзаменаторів для складання дорожніх тестів Class 5 і 7", "url": "https://agayardo.github.io/LearnToDriveSmartBC/examiners-tips-for-passing-the-class-5-and-7-road-tests.html" },
+    { "@type": "Chapter", "name": "Посвідчення особи (ID)", "url": "https://agayardo.github.io/LearnToDriveSmartBC/identification-id.html" }
+  ],
   "workExample": {
     "@type": "Book",
     "bookFormat": "https://schema.org/EBook",
@@ -60,6 +78,9 @@
   .lead { font-size: 1.1rem; margin: 0 0 24px; }
   .btn { display: inline-block; background: var(--blue); color: #fff; text-decoration: none; font-weight: 600; padding: 14px 24px; border-radius: 10px; font-size: 1.1rem; }
   .btn:hover { background: var(--blue-dark); }
+  .btn.secondary { background: #fff; color: var(--blue); border: 2px solid var(--blue); padding: 12px 22px; margin-left: 8px; }
+  .btn.secondary:hover { background: #eef4fb; }
+  ul.toc li { margin: 8px 0; }
   .small { display: block; margin-top: 10px; color: var(--muted); font-size: .95rem; }
   .small a { color: var(--blue); }
   section { margin-top: 36px; }
@@ -86,8 +107,10 @@
     <h1>Вчіться водити розумно</h1>
     <p class="sub">Learn to Drive Smart — посібник водія ICBC для Британської Колумбії, українською мовою</p>
     <p class="lead">Усе, що потрібно знати, щоб отримати водійські права в Британській Колумбії (Канада): правила дорожнього руху, дорожні знаки, як проходить тест на знання (knowledge test) і дорожній тест (road test). Повний переклад офіційного посібника ICBC.</p>
-    <a class="btn" href="LearnToDriveSmart_UA.pdf">Відкрити PDF</a>
-    <span class="small">177 сторінок, 14 МБ, безкоштовно. <a href="LearnToDriveSmart_UA.pdf" download>Завантажити на пристрій</a></span>
+    <a class="btn" href="01-you-in-the-driver-s-seat.html">Читати онлайн</a>
+    <a class="btn secondary" href="LearnToDriveSmart_UA.pdf">Відкрити PDF</a>
+    <span class="small">PDF: 177 сторінок, 14 МБ, безкоштовно. <a href="LearnToDriveSmart_UA.pdf" download>Завантажити на пристрій</a></span>
+    <span class="small" id="continue" hidden>Ви читали: <a href=""></a></span>
   </div>
 </div>
 
@@ -97,19 +120,22 @@
 </section>
 
 <section>
-  <h2>Що всередині</h2>
-  <ul>
-    <li>Що взяти до офісу видачі посвідчень водія, оплата, періоди очікування перед повторним тестом</li>
-    <li>Розділ 1. Ви за кермом — програма поетапного отримання прав (Graduated Licensing), обмеження для нових водіїв</li>
-    <li>Розділ 2. Ви і ваш транспортний засіб — керування, дзеркала, ремені, страхування</li>
-    <li>Розділ 3. Знаки, сигнали та дорожня розмітка</li>
-    <li>Розділ 4. Правила дорожнього руху — швидкість, перехрестя, повороти, право проїзду, паркування</li>
-    <li>Розділ 5. Дивись – думай – дій — як передбачати небезпеку</li>
-    <li>Розділ 6. Спільне користування дорогою — пішоходи, велосипедисти, мотоцикли, вантажівки, шкільні автобуси</li>
-    <li>Розділ 7. Особисті стратегії — втома, алкоголь, наркотики, телефон за кермом</li>
-    <li>Розділ 8. Стратегії в надзвичайних ситуаціях — занос, відмова гальм, ДТП</li>
-    <li>Розділ 9. Ваше посвідчення водія — класи прав, обмін іноземного посвідчення, штрафні бали</li>
-    <li>Про тест на знання, про дорожній тест, поради екзаменаторів, які документи потрібні (ID)</li>
+  <h2>Читати онлайн</h2>
+  <p>Кожен розділ є окремою сторінкою. Сторінка запам’ятовує, де ви зупинилися, і наступного разу відкривається на тому ж місці.</p>
+  <ul class="toc">
+    <li><a href="what-to-take-to-the-driver-licensing-office.html">Що взяти до офісу видачі посвідчень водія</a> — оплата, періоди очікування перед повторним тестом</li>
+    <li><a href="using-this-guide.html">Використання цього посібника</a></li>
+    <li><a href="01-you-in-the-driver-s-seat.html">Розділ 1. Ви за кермом</a> — програма поетапного отримання прав (Graduated Licensing), обмеження для нових водіїв</li>
+    <li><a href="02-you-and-your-vehicle.html">Розділ 2. Ви і ваш транспортний засіб</a> — керування, дзеркала, ремені, страхування</li>
+    <li><a href="03-signs-signals-and-road-markings.html">Розділ 3. Знаки, сигнали та дорожня розмітка</a></li>
+    <li><a href="04-rules-of-the-road.html">Розділ 4. Правила дорожнього руху</a> — швидкість, перехрестя, повороти, право проїзду, паркування</li>
+    <li><a href="05-see-think-do.html">Розділ 5. Дивись – думай – дій</a> — як передбачати небезпеку</li>
+    <li><a href="06-sharing-the-road.html">Розділ 6. Спільне користування дорогою</a> — пішоходи, велосипедисти, мотоцикли, вантажівки, шкільні автобуси</li>
+    <li><a href="07-personal-strategies.html">Розділ 7. Особисті стратегії</a> — втома, алкоголь, наркотики, телефон за кермом</li>
+    <li><a href="08-emergency-strategies.html">Розділ 8. Стратегії в надзвичайних ситуаціях</a> — занос, відмова гальм, ДТП</li>
+    <li><a href="09-your-licence.html">Розділ 9. Ваше посвідчення водія</a> — класи прав, обмін іноземного посвідчення, штрафні бали</li>
+    <li><a href="10-more-information.html">Розділ 10. Додаткова інформація</a></li>
+    <li><a href="about-the-knowledge-test.html">Про тест на знання</a>, <a href="about-your-road-test.html">про дорожній тест</a>, <a href="examiners-tips-for-passing-the-class-5-and-7-road-tests.html">поради екзаменаторів</a>, <a href="identification-id.html">які документи потрібні (ID)</a></li>
   </ul>
 </section>
 
@@ -130,5 +156,18 @@
 </footer>
 
 </main>
+<script>
+(function () {
+  var last = localStorage.getItem("reading-position:last");
+  if (!last) return;
+  var file = last.split("/").pop();
+  var link = document.querySelector('ul.toc a[href="' + file + '"]');
+  if (!link) return;
+  var box = document.getElementById("continue");
+  box.querySelector("a").href = file;
+  box.querySelector("a").textContent = link.textContent;
+  box.hidden = false;
+})();
+</script>
 </body>
 </html>

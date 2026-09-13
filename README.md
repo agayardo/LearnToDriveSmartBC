@@ -25,7 +25,7 @@ Remove the English text from the page with redactions that keep drawings and ima
 - `pages/NNN.pdf` — one file per page, produced by `qpdf --split-pages driver-full.pdf pages/%d.pdf`. Never modified.
 - `pages/NNN.ua.pdf` — the translated page, written by `apply` from `translations/NNN.json`. A page is done when this file exists. PNG renders in `pages/` are gitignored scratch files.
 - `docs/LearnToDriveSmart_UA.pdf` — the translated pages merged in order with `qpdf`, then re-saved with PyMuPDF's full garbage collection so that the Avenir Next faces, which every page embeds, are stored once.
-- `docs/` — the GitHub Pages site: `index.html`, the PDF above, its cover, `robots.txt`, `sitemap.xml`. Written for readers of the translation, not for contributors.
+- `docs/` — the GitHub Pages site: `index.html`, the PDF above, its cover, `robots.txt`, `sitemap.xml`, and the HTML edition: one page per chapter and per front or back matter part (`NN-slug.html`, `slug.html`) with its pictures in `docs/img/`. Written for readers of the translation, not for contributors. `index.html` is written by hand; everything else in the HTML edition is written by `tools/sitekit.py`, so edit the translation JSON and regenerate rather than editing those files.
 - `translations/NNN.json` — one file per page: region ids mapped to Ukrainian HTML, optional box and centering.
 - `translation-report.md` — TODO lines for a human reviewer, appended per page as described in `notes/translate-page.md`.
 - `notes/analysis.md` — how the PDF is built and what makes translation hard.
@@ -33,6 +33,7 @@ Remove the English text from the page with redactions that keep drawings and ima
 - `translation-glossary-ua.md` — recurring terms whose translation is a choice, `<english text> -> <ua translation>`, read in full before each page and appended when a page settles one. Kept short on purpose.
 - `fonts/` — the Avenir Next faces split into `.ttf` files (macOS system fonts, not committed).
 - `tools/pagekit.py`, `tests/` — the tool and its tests.
+- `tools/sitekit.py` — writes the HTML edition from `translations/*.json` and the region roles `pagekit` derives from the English pages. The layout is not reproduced: headings, paragraphs, and lists flow in reading order; a drawing cluster that is mostly text becomes an aside (driving tip, crash fact, warning, think about, story, strategies panel) placed after the text it sits beside; a cluster that is mostly drawing becomes a picture cropped from `pages/NNN.ua.pdf`, so lettering inside illustrations stays in the picture; rows of captioned pictures become galleries; ruled grids with a white header band become tables. Each page's printed number is an anchor (`#p106`). `.venv/bin/python -m tools.sitekit` writes every page and `docs/sitemap.xml`; a chapter number as argument writes that chapter only.
 - `.venv/` — Python with PyMuPDF, fontTools, and pytest.
 
 ## Tools
