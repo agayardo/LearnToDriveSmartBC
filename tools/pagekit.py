@@ -344,31 +344,33 @@ class Page:
             self._textless = scratch[0].get_pixmap(matrix=pymupdf.Matrix(RENDER_SCALE, RENDER_SCALE))
         pix = self._textless
         cx, cy = int(shape.x0 + shape.width / 2) * RENDER_SCALE, int(shape.y0 + shape.height / 2) * RENDER_SCALE
-        white = lambda x, y: all(c > WHITE_LEVEL for c in pix.pixel(x, y)[:3])
+        reach = int(shape.height * RENDER_SCALE / 2)
+        runs = {y: _white_runs(pix, y) for y in range(max(0, cy - reach), min(pix.height, cy + reach))}
         best = Rect(cx - 1, cy - 1, cx + 1, cy + 1)
-        for half_height in range(2, int(shape.height * RENDER_SCALE / 2)):
+        for half_height in range(2, reach):
             y0, y1 = cy - half_height, cy + half_height
-            if y0 < 0 or y1 >= pix.height or not all(white(cx, y) for y in range(y0, y1)):
+            rows = [runs[y] for y in range(y0, y1) if y in runs]
+            if len(rows) < y1 - y0 or any(left[cx] == 0 for left, _ in rows):
                 break
-            x0 = x1 = cx
-            while x0 > 0 and all(white(x0 - 1, y) for y in range(y0, y1)):
-                x0 -= 1
-            while x1 < pix.width - 1 and all(white(x1 + 1, y) for y in range(y0, y1)):
-                x1 += 1
+            x0 = cx - min(left[cx] for left, _ in rows) + 1
+            x1 = cx + min(right[cx] for _, right in rows) - 1
             candidate = Rect(x0, y0, x1, y1)
             if candidate.width >= candidate.height * TEXT_BOX_MIN_ASPECT and candidate.get_area() > best.get_area():
                 best = candidate
         return best / RENDER_SCALE + (BUBBLE_PADDING, BUBBLE_PADDING, -BUBBLE_PADDING, -BUBBLE_PADDING)
 
-    def illustrations(self) -> list[tuple[Rect, int]]:
-        """Drawing clusters large enough to be artwork, with the count of real-text lines inside."""
-        page_rect = self.page.rect
+    def illustrations(self, min_size: float) -> list[tuple[Rect, int]]:
+        return self.pictures(self.page.rect, min_size)
+
+    def pictures(self, container: Rect, min_size: float) -> list[tuple[Rect, int]]:
+        """Drawing clusters inside container at least min_size points in both dimensions, with the count of
+        real-text lines inside each. A drawing that covers most of the container is its background, not a picture."""
         kept = [
             d for d in self.drawings
-            if d["rect"].width >= 1.5 and d["rect"].height >= 1.5
-            and not (d["rect"].width > page_rect.width * 0.8 and d["rect"].height > page_rect.height * 0.8)
+            if d["rect"].width >= 1.5 and d["rect"].height >= 1.5 and _center(d["rect"]) in container
+            and not (d["rect"].width > container.width * BACKGROUND_FRACTION and d["rect"].height > container.height * BACKGROUND_FRACTION)
         ]
-        clusters = [r for r in self.page.cluster_drawings(drawings=kept) if r.width >= ART_MIN and r.height >= ART_MIN] if kept else []
+        clusters = [r for r in self.page.cluster_drawings(drawings=kept) if r.width >= min_size and r.height >= min_size] if kept else []
         lines = self._lines()
         return [(c, sum(1 for l in lines if _center(l.bbox) in c)) for c in clusters]
 
@@ -385,7 +387,7 @@ class Page:
                 notes.append(f"{r.id}: small text ({r.style.size}pt) inside artwork")
             elif r.rect.width < NARROW_PT and r.role not in ("page-number", "running-header", "heading", "panel-title"):
                 notes.append(f"{r.id}: narrow box ({r.rect.width:.0f}pt), likely to shrink")
-        for rect, n in self.illustrations():
+        for rect, n in self.illustrations(ART_MIN):
             where = f"({rect.x0:.0f},{rect.y0:.0f},{rect.x1:.0f},{rect.y1:.0f})"
             if n:
                 notes.append(f"illustration at {where} contains {n} line(s) of real text (translatable regions above)")
@@ -525,6 +527,22 @@ def _split_by_shape(line: Line, white: list[Rect], pills: list[Rect]) -> list[Li
     return out
 
 
+def _white_runs(pix: pymupdf.Pixmap, y: int) -> tuple[list[int], list[int]]:
+    """For each pixel of row y: how many white pixels run through it leftwards and rightwards, itself included."""
+    n, start = pix.n, y * pix.stride
+    row = pix.samples[start:start + pix.width * n]
+    white = [r > WHITE_LEVEL and g > WHITE_LEVEL and b > WHITE_LEVEL for r, g, b in zip(row[0::n], row[1::n], row[2::n])]
+    left = [0] * pix.width
+    right = [0] * pix.width
+    for x in range(pix.width):
+        if white[x]:
+            left[x] = left[x - 1] + 1 if x else 1
+    for x in range(pix.width - 1, -1, -1):
+        if white[x]:
+            right[x] = right[x + 1] + 1 if x + 1 < pix.width else 1
+    return left, right
+
+
 def _separated(regions: list[Region]) -> list[Region]:
     """Trailing spaces widen a text extent; cut a box short where it would run into a neighbour to its right."""
     for r in regions:
@@ -646,6 +664,7 @@ RENDER_SCALE = 4
 FACE_WEIGHTS = (400, 500, 600, 700)
 PILL_MAX_H = 30.0
 ART_MIN = 40.0
+BACKGROUND_FRACTION = 0.8
 SMALL_TEXT_PT = 7.0
 NARROW_PT = 120.0
 TIGHT_SCALE = 0.9
