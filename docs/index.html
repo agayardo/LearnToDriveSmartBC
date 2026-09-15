@@ -110,7 +110,7 @@
     <a class="btn" href="01-you-in-the-driver-s-seat.html">Читати онлайн</a>
     <a class="btn secondary" href="LearnToDriveSmart_UA.pdf">Відкрити PDF</a>
     <span class="small">PDF: 177 сторінок, 14 МБ, безкоштовно. <a href="LearnToDriveSmart_UA.pdf" download>Завантажити на пристрій</a></span>
-    <span class="small" id="continue" hidden>Ви читали: <a href=""></a></span>
+    <span class="small" id="continue" hidden>Ви читали: </span>
   </div>
 </div>
 
@@ -164,8 +164,10 @@
   var link = document.querySelector('ul.toc a[href="' + file + '"]');
   if (!link) return;
   var box = document.getElementById("continue");
-  box.querySelector("a").href = file;
-  box.querySelector("a").textContent = link.textContent;
+  var a = document.createElement("a");
+  a.href = file;
+  a.textContent = link.textContent;
+  box.appendChild(a);
   box.hidden = false;
 })();
 </script>
