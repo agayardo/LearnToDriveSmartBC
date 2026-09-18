@@ -2,6 +2,8 @@
 
 Translate ICBC's driver handbook *Learn to Drive Smart* (British Columbia) into Ukrainian, reproducing the original layout.
 
+The translation is published at <https://agayardo.github.io/LearnToDriveSmartBC/>, as a PDF and as an HTML edition with one page per chapter.
+
 ## Source
 
 The only input is `driver-full.pdf`. There are no source documents, fonts, or text exports. We reverse engineer the PDF and reassemble it.
