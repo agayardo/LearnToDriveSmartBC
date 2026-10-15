@@ -233,7 +233,7 @@ def test_the_site_has_sixteen_pages_in_book_order_with_neighbours_linked(book):
 def test_sitemap_lists_the_index_the_pdf_and_every_page(book, tmp_path):
     text = book.write_sitemap(tmp_path).read_text()
     assert text.count("<loc>") == 18
-    assert "<loc>https://agayardo.github.io/LearnToDriveSmartBC/09-your-licence.html</loc>" in text
+    assert "<loc>https://drive-smart-bc-ua.gayardo.com/09-your-licence.html</loc>" in text
 
 
 def test_glp_diagram_with_its_labels_is_one_picture_not_a_note(chapter9):

@@ -2,7 +2,7 @@
 
 Translate ICBC's driver handbook *Learn to Drive Smart* (British Columbia) into Ukrainian, reproducing the original layout.
 
-The translation is published at <https://agayardo.github.io/LearnToDriveSmartBC/>, as a PDF and as an HTML edition with one page per chapter.
+The translation is published at <https://drive-smart-bc-ua.gayardo.com/>, as a PDF and as an HTML edition with one page per chapter.
 
 ## Source
 
@@ -27,7 +27,7 @@ Remove the English text from the page with redactions that keep drawings and ima
 - `pages/NNN.pdf` — one file per page, produced by `qpdf --split-pages driver-full.pdf pages/%d.pdf`. Never modified.
 - `pages/NNN.ua.pdf` — the translated page, written by `apply` from `translations/NNN.json`. A page is done when this file exists. PNG renders in `pages/` are gitignored scratch files.
 - `docs/LearnToDriveSmart_UA.pdf` — the translated pages merged in order with `qpdf`, then re-saved with PyMuPDF's full garbage collection so that the Avenir Next faces, which every page embeds, are stored once.
-- `docs/` — the GitHub Pages site: `index.html`, the PDF above, its cover, `robots.txt`, `sitemap.xml`, and the HTML edition: one page per chapter and per front or back matter part (`NN-slug.html`, `slug.html`) with its pictures in `docs/img/`. Written for readers of the translation, not for contributors. `index.html` is written by hand; everything else in the HTML edition is written by `tools/sitekit.py`, so edit the translation JSON and regenerate rather than editing those files.
+- `docs/` — the GitHub Pages site, published at the domain in `docs/CNAME`: `index.html`, the PDF above, its cover, `robots.txt`, `sitemap.xml`, and the HTML edition: one page per chapter and per front or back matter part (`NN-slug.html`, `slug.html`) with its pictures in `docs/img/`. Written for readers of the translation, not for contributors. `index.html` is written by hand; everything else in the HTML edition is written by `tools/sitekit.py`, so edit the translation JSON and regenerate rather than editing those files.
 - `translations/NNN.json` — one file per page: region ids mapped to Ukrainian HTML, optional box and centering.
 - `translation-report.md` — TODO lines for a human reviewer, appended per page as described in `notes/translate-page.md`.
 - `notes/analysis.md` — how the PDF is built and what makes translation hard.
