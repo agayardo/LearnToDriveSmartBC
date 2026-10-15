@@ -8,8 +8,14 @@ ROOT = Path(__file__).resolve().parent.parent
 
 
 @pytest.fixture(scope="module")
-def chapter3():
-    return Book(ROOT).chapter(3)
+def book():
+    """One book for the module, so that each page is analysed once however many tests read its section."""
+    return Book(ROOT)
+
+
+@pytest.fixture(scope="module")
+def chapter3(book):
+    return book.chapter(3)
 
 
 def test_chapter_3_covers_pages_40_to_51_and_is_titled_from_the_translated_chapter_bar(chapter3):
@@ -79,13 +85,13 @@ from tools.sitekit import Aside, Pill  # noqa: E402
 
 
 @pytest.fixture(scope="module")
-def chapter5():
-    return Book(ROOT).chapter(5)
+def chapter5(book):
+    return book.chapter(5)
 
 
 @pytest.fixture(scope="module")
-def chapter1():
-    return Book(ROOT).chapter(1)
+def chapter1(book):
+    return book.chapter(1)
 
 
 def asides(chapter, kind):
@@ -159,18 +165,18 @@ from tools.sitekit import Table  # noqa: E402
 
 
 @pytest.fixture(scope="module")
-def chapter2():
-    return Book(ROOT).chapter(2)
+def chapter2(book):
+    return book.chapter(2)
 
 
 @pytest.fixture(scope="module")
-def chapter7():
-    return Book(ROOT).chapter(7)
+def chapter7(book):
+    return book.chapter(7)
 
 
 @pytest.fixture(scope="module")
-def chapter9():
-    return Book(ROOT).chapter(9)
+def chapter9(book):
+    return book.chapter(9)
 
 
 def tables(chapter):
@@ -215,8 +221,7 @@ def test_table_renders_with_header_cells_and_rowspan(chapter7, tmp_path):
 # --- the whole site ----------------------------------------------------------------
 
 
-def test_the_site_has_sixteen_pages_in_book_order_with_neighbours_linked():
-    book = Book(ROOT)
+def test_the_site_has_sixteen_pages_in_book_order_with_neighbours_linked(book):
     names = [s.file_name for s in book.sections]
     assert names[:3] == ["what-to-take-to-the-driver-licensing-office.html", "using-this-guide.html", "01-you-in-the-driver-s-seat.html"]
     assert names[-2:] == ["examiners-tips-for-passing-the-class-5-and-7-road-tests.html", "identification-id.html"]
@@ -225,8 +230,8 @@ def test_the_site_has_sixteen_pages_in_book_order_with_neighbours_linked():
     assert (previous.file_name, following.file_name) == ("09-your-licence.html", "about-the-knowledge-test.html")
 
 
-def test_sitemap_lists_the_index_the_pdf_and_every_page(tmp_path):
-    text = Book(ROOT).write_sitemap(tmp_path).read_text()
+def test_sitemap_lists_the_index_the_pdf_and_every_page(book, tmp_path):
+    text = book.write_sitemap(tmp_path).read_text()
     assert text.count("<loc>") == 18
     assert "<loc>https://agayardo.github.io/LearnToDriveSmartBC/09-your-licence.html</loc>" in text
 
@@ -255,6 +260,6 @@ def test_chapter_5_headings_nest_as_the_outline_does_and_its_contents_list_the_t
     assert "Перешкоди для огляду" not in [h.text for h in contents]
 
 
-def test_a_heading_missing_from_the_outline_takes_its_level_from_its_size():
-    booking = next(h for h in Book(ROOT).chapter(10).blocks if isinstance(h, Heading) and h.id == "booking-road-tests-and-licensing-information")
+def test_a_heading_missing_from_the_outline_takes_its_level_from_its_size(book):
+    booking = next(h for h in book.chapter(10).blocks if isinstance(h, Heading) and h.id == "booking-road-tests-and-licensing-information")
     assert booking.level == 2

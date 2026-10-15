@@ -345,15 +345,16 @@ class Page:
         pix = self._textless
         cx, cy = int(shape.x0 + shape.width / 2) * RENDER_SCALE, int(shape.y0 + shape.height / 2) * RENDER_SCALE
         reach = int(shape.height * RENDER_SCALE / 2)
-        runs = {y: _white_runs(pix, y) for y in range(max(0, cy - reach), min(pix.height, cy + reach))}
+        samples = pix.samples
+        runs = {y: _white_runs(pix, samples, cx, y) for y in range(max(0, cy - reach), min(pix.height, cy + reach))}
         best = Rect(cx - 1, cy - 1, cx + 1, cy + 1)
         for half_height in range(2, reach):
             y0, y1 = cy - half_height, cy + half_height
             rows = [runs[y] for y in range(y0, y1) if y in runs]
-            if len(rows) < y1 - y0 or any(left[cx] == 0 for left, _ in rows):
+            if len(rows) < y1 - y0 or any(left == 0 for left, _ in rows):
                 break
-            x0 = cx - min(left[cx] for left, _ in rows) + 1
-            x1 = cx + min(right[cx] for _, right in rows) - 1
+            x0 = cx - min(left for left, _ in rows) + 1
+            x1 = cx + min(right for _, right in rows) - 1
             candidate = Rect(x0, y0, x1, y1)
             if candidate.width >= candidate.height * TEXT_BOX_MIN_ASPECT and candidate.get_area() > best.get_area():
                 best = candidate
@@ -527,20 +528,24 @@ def _split_by_shape(line: Line, white: list[Rect], pills: list[Rect]) -> list[Li
     return out
 
 
-def _white_runs(pix: pymupdf.Pixmap, y: int) -> tuple[list[int], list[int]]:
-    """For each pixel of row y: how many white pixels run through it leftwards and rightwards, itself included."""
-    n, start = pix.n, y * pix.stride
-    row = pix.samples[start:start + pix.width * n]
-    white = [r > WHITE_LEVEL and g > WHITE_LEVEL and b > WHITE_LEVEL for r, g, b in zip(row[0::n], row[1::n], row[2::n])]
-    left = [0] * pix.width
-    right = [0] * pix.width
-    for x in range(pix.width):
-        if white[x]:
-            left[x] = left[x - 1] + 1 if x else 1
-    for x in range(pix.width - 1, -1, -1):
-        if white[x]:
-            right[x] = right[x + 1] + 1 if x + 1 < pix.width else 1
-    return left, right
+def _white_runs(pix: pymupdf.Pixmap, samples: bytes, x: int, y: int) -> tuple[int, int]:
+    """How many white pixels run through pixel (x, y) leftwards and rightwards, itself included. The caller reads
+    samples once, since pix.samples copies the whole pixmap on every access."""
+    n, start, width = pix.n, y * pix.stride, pix.width
+
+    def white(px: int) -> bool:
+        o = start + px * n
+        return samples[o] > WHITE_LEVEL and samples[o + 1] > WHITE_LEVEL and samples[o + 2] > WHITE_LEVEL
+
+    if not white(x):
+        return 0, 0
+    left = x
+    while left > 0 and white(left - 1):
+        left -= 1
+    right = x
+    while right + 1 < width and white(right + 1):
+        right += 1
+    return x - left + 1, right - x + 1
 
 
 def _separated(regions: list[Region]) -> list[Region]:
